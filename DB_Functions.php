@@ -22,54 +22,39 @@ class DB_Functions {
         
     }
 
-    /**
-     * Storing new user
-     * returns user details
-     */
-    public function storeUser($name, $email, $password) {
-        $uuid = uniqid('', true);
-        $hash = $this->hashSSHA($password);
-        $encrypted_password = $hash["encrypted"]; // encrypted password
-        $salt = $hash["salt"]; // salt
-
-        $stmt = $this->conn->prepare("INSERT INTO users(unique_id, name, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("sssss", $uuid, $name, $email, $encrypted_password, $salt);
-        $result = $stmt->execute();
-        $stmt->close();
-
-        // check for successful store
-        if ($result) {
-            $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $user = $stmt->get_result()->fetch_assoc();
+    public function saveErfassung($mitarbeiterid, $leistung, $zeit, $projekt, $dauer){
+        $stmt = $this->conn->prepare("INSERT INTO `zeiterfassung`( `mitarbeiter_id`, `leistungs_id`, `projekt_id`, `datum`, `dauer`) VALUES (".$mitarbeiterid.", ".$leistung.", ".$projekt.", '".$zeit."', ".$dauer.")");
+        if ($stmt->execute()) {
             $stmt->close();
-
-            return $user;
-        } else {
-            return false;
+            return true;
         }
+        else return false;
+
     }
 
     /**
-     * Get user by email and password
+     * Get user by MitarbeiterID and password
+     * @param $mitarbeiterid
+     * @param $password
+     * @return array|null
      */
-    public function getUserByEmailAndPassword($email, $password) {
+    public function getUserByEmailAndPassword($mitarbeiterid, $password) {
 
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT * FROM mitarbeiter WHERE mitarbeiter_id = ?");
 
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $mitarbeiterid);
 
         if ($stmt->execute()) {
             $user = $stmt->get_result()->fetch_assoc();
             $stmt->close();
 
             // verifying user password
-            $salt = $user['salt'];
-            $encrypted_password = $user['encrypted_password'];
-            $hash = $this->checkhashSSHA($salt, $password);
+            //$salt = $user['salt'];
+            $encrypted_password = $user['passwort'];
+            //$hash = $this->checkhashSSHA($salt, $password);
             // check for password equality
-            if ($encrypted_password == $hash) {
+            //if ($encrypted_password == $hash) {
+            if ($encrypted_password == $password) {
                 // user authentication details are correct
                 return $user;
             }
@@ -82,7 +67,7 @@ class DB_Functions {
      * Check user is existed or not
      */
     public function isUserExisted($email) {
-        $stmt = $this->conn->prepare("SELECT email from users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT MitarbeiterID from users WHERE MitarbeiterID = ?");
 
         $stmt->bind_param("s", $email);
 

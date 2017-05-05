@@ -1,1 +1,2 @@
-not a webpage
+<?php
+echo 'not a webpage';

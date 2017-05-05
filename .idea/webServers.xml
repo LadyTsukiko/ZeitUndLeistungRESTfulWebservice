@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="5aeea117-4006-4865-8fcb-ff56c5d6601f" name="bfh" url="http://147.87.116.243">
+        <fileTransfer host="147.87.116.243" port="21" rootFolder="/../../var/www/html">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="e2e32033-a286-4ddf-9cd9-38fa6383ae94" name="local" url="http://localhost">
+        <fileTransfer port="0" accessType="LOCAL" />
+      </webServer>
+    </option>
+  </component>
+</project>

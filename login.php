@@ -4,43 +4,47 @@
  * @author Ravi Tamada
  * @link http://www.androidhive.info/2012/01/android-login-and-registration-with-php-mysql-and-sqlite/ Complete tutorial
 
- adaptet by Alex*/
+ adapted by Alex*/
 
-require_once 'include/DB_Functions.php';
+require_once("DB_Functions.php");
+
 $db = new DB_Functions();
-
 // json response array
 $response = array("error" => FALSE);
 
-if (isset($_POST['email']) && isset($_POST['password'])) {
+
+if (isset($_POST['MitarbeiterID']) && isset($_POST['password'])) {
 
     // receiving the post params
-    $email = $_POST['email'];
+    $MitarbeiterID = $_POST['MitarbeiterID'];
     $password = $_POST['password'];
 
-    // get the user by email and password
-    $user = $db->getUserByEmailAndPassword($email, $password);
+    // get the user by MitarbeiterID and password
+    $user = $db->getUserByEmailAndPassword($MitarbeiterID, $password);
 
-    if ($user != false) {
-        // use is found
+    if ($user != false && user["inaktiv_flag"]!=1) {
+        // user is found
         $response["error"] = FALSE;
-        $response["uid"] = $user["unique_id"];
-        $response["user"]["name"] = $user["name"];
-        $response["user"]["email"] = $user["email"];
-        $response["user"]["created_at"] = $user["created_at"];
-        $response["user"]["updated_at"] = $user["updated_at"];
+
+        //$response["user"]["name"] = $user["name"];
+
         echo json_encode($response);
-    } else {
+    }
+    elseif ($user != false){
+        $response["error"] = TRUE;
+        $response["error_msg"] = "Sie sind kein aktiver Mitarbeiter. Bitte kontaktieren Sie einen Admin";
+    }
+    else {
         // user is not found with the credentials
         $response["error"] = TRUE;
-        $response["error_msg"] = "Login credentials are wrong. Please try again!";
+        $response["error_msg"] = "Falsches Passwort oder ID. Bitte erneut versuchen";
         echo json_encode($response);
     }
 } else {
     // required post params is missing
     $response["error"] = TRUE;
-    $response["error_msg"] = "Required parameters email or password is missing!";
+    $response["error_msg"] = "Required parameters MitarbeiterID or password is missing!";
     echo json_encode($response);
 }
-?>
+
 
