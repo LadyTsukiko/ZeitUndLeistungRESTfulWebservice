@@ -19,7 +19,7 @@ if (isset($_POST['Dauer']))// && isset($_POST['Dauer'])&& isset($_POST['Leistung
     $leistung = $_POST['Leistung'];
     $projekt = $_POST['Projekt'];
     $mitarbeiterid = $_POST['MitarbeiterID'];
-   if($db->saveErfassung($mitarbeiterid,$leistung, $datum, $projekt, $dauer)){
+   if($db->saveErfassung($mitarbeiterid, $leistung, $datum, $projekt, $dauer)){
        $response["error"] = FALSE;
        $response["sucsess"] = "erfassung has been saved";
        echo json_encode($response);

@@ -23,7 +23,8 @@ class DB_Functions {
     }
 
     public function saveErfassung($mitarbeiterid, $leistung, $zeit, $projekt, $dauer){
-        $stmt = $this->conn->prepare("INSERT INTO `zeiterfassung`( `mitarbeiter_id`, `leistungs_id`, `projekt_id`, `datum`, `dauer`) VALUES (".$mitarbeiterid.", ".$leistung.", ".$projekt.", '".$zeit."', ".$dauer.")");
+                                    //INSERT INTO `zeiterfassung`( `mitarbeiter_id`, `leistungs_id`, `projekt_id`, `datum`, `dauer`) SELECT 12,                  leistung.leistungs_id, projekt.projekt_id, 1234-12-12, 1234       FROM projekt INNER JOIN leistung WHERE leistung.name = "test" AND projekt.name = "test"
+        $stmt = $this->conn->prepare("INSERT INTO `zeiterfassung`( `mitarbeiter_id`, `leistungs_id`, `projekt_id`, `datum`, `dauer`)  SELECT ".$mitarbeiterid.", leistung.leistungs_id, projekt.projekt_id , '".$zeit."', ".$dauer." FROM projekt INNER JOIN leistung WHERE leistung.name like '".$leistung."' AND projekt.name like '".$projekt."'");
         if ($stmt->execute()) {
             $stmt->close();
             return true;
@@ -66,10 +67,10 @@ class DB_Functions {
     /**
      * Check user is existed or not
      */
-    public function isUserExisted($email) {
+    public function isUserExisted($id) {
         $stmt = $this->conn->prepare("SELECT MitarbeiterID from users WHERE MitarbeiterID = ?");
 
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("s", $id);
 
         $stmt->execute();
 
@@ -110,6 +111,31 @@ class DB_Functions {
         $hash = base64_encode(sha1($password . $salt, true) . $salt);
 
         return $hash;
+    }
+
+    public function getProjekteAndLeistung(){
+        $stmt = $this->conn->prepare("SELECT name FROM projekt");
+
+        if ($stmt->execute()) {
+            $resArrayP = array();
+            $result = $stmt->get_result();
+            while ($row=$result->fetch_assoc()){
+                $resArrayP[] = $row;
+            }
+            $stmt->close();
+        }
+        $stmt = $this->conn->prepare("SELECT name FROM leistung");
+
+        if ($stmt->execute()) {
+            $resArrayL = array();
+            $result = $stmt->get_result();
+            while ($row=$result->fetch_assoc()){
+                $resArrayL[] = $row;
+            }
+            $stmt->close();
+        }
+
+        return array($resArrayP, $resArrayL);
     }
 
 }
