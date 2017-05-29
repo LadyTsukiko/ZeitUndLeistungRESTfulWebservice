@@ -1,9 +1,10 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: alex
+ * User: Alexandra de Groof
  * Date: 06/05/2017
  * Time: 19:57
+ * gets the projects and services
  */
 
 require_once("DB_Functions.php");

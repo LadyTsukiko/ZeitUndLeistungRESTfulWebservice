@@ -1,9 +1,9 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: alex
+ * User: Alexandra de Groof
  * Date: 05/05/2017
- * Time: 08:48
+ * saves the 'erfassung'
  */
 
 require_once("DB_Functions.php");
@@ -12,7 +12,7 @@ $db = new DB_Functions();
 
 $response = array("error" => FALSE);
 
-if (isset($_POST['Dauer']))// && isset($_POST['Dauer'])&& isset($_POST['Leistung'])&& isset($_POST['Projekt'])&& isset($_POST['MitarbeiterID']))
+if (isset($_POST['Dauer']) && isset($_POST['Leistung'])&& isset($_POST['Projekt'])&& isset($_POST['MitarbeiterID']))
 {
     $datum = $_POST['Datum'];
     $dauer = $_POST['Dauer'];

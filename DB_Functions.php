@@ -3,6 +3,7 @@
 /**
  * @author Ravi Tamada
  * @link http://www.androidhive.info/2012/01/android-login-and-registration-with-php-mysql-and-sqlite/ Complete tutorial
+ * adapted by Alexandra de Groof
  */
 
 class DB_Functions {
@@ -22,6 +23,15 @@ class DB_Functions {
         
     }
 
+    /**
+     * save the 'Erfassung' to the db, returns false in case the sql trows an error
+     * @param $mitarbeiterid
+     * @param $leistung
+     * @param $zeit
+     * @param $projekt
+     * @param $dauer
+     * @return bool
+     */
     public function saveErfassung($mitarbeiterid, $leistung, $zeit, $projekt, $dauer){
                                     //INSERT INTO `zeiterfassung`( `mitarbeiter_id`, `leistungs_id`, `projekt_id`, `datum`, `dauer`) SELECT 12,                  leistung.leistungs_id, projekt.projekt_id, 1234-12-12, 1234       FROM projekt INNER JOIN leistung WHERE leistung.name = "test" AND projekt.name = "test"
         $stmt = $this->conn->prepare("INSERT INTO `zeiterfassung`( `mitarbeiter_id`, `leistungs_id`, `projekt_id`, `datum`, `dauer`)  SELECT ".$mitarbeiterid.", leistung.leistungs_id, projekt.projekt_id , '".$zeit."', ".$dauer." FROM projekt INNER JOIN leistung WHERE leistung.name like '".$leistung."' AND projekt.name like '".$projekt."'");
@@ -34,14 +44,14 @@ class DB_Functions {
     }
 
     /**
-     * Get user by MitarbeiterID and password
+     * Get user by MitarbeiterID and password + verifies pw and if user is active
      * @param $mitarbeiterid
      * @param $password
      * @return array|null
      */
     public function getUserByEmailAndPassword($mitarbeiterid, $password) {
 
-        $stmt = $this->conn->prepare("SELECT * FROM mitarbeiter WHERE mitarbeiter_id = ?");
+        $stmt = $this->conn->prepare("SELECT * FROM mitarbeiter WHERE inaktiv_flag = 0 AND mitarbeiter_id = ?");
 
         $stmt->bind_param("s", $mitarbeiterid);
 
@@ -50,13 +60,11 @@ class DB_Functions {
             $stmt->close();
 
             // verifying user password
-            //$salt = $user['salt'];
             $encrypted_password = $user['passwort'];
-            //$hash = $this->checkhashSSHA($salt, $password);
             // check for password equality
-            //if ($encrypted_password == $hash) {
-            if ($encrypted_password == $password) {
-                // user authentication details are correct
+            if (password_verify($password, $encrypted_password))//php function that uses bcrypt
+            {
+                           // user authentication details are correct
                 return $user;
             }
         } else {
@@ -64,34 +72,13 @@ class DB_Functions {
         }
     }
 
-    /**
-     * Check user is existed or not
-     */
-    public function isUserExisted($id) {
-        $stmt = $this->conn->prepare("SELECT MitarbeiterID from users WHERE MitarbeiterID = ?");
 
-        $stmt->bind_param("s", $id);
 
-        $stmt->execute();
-
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            // user existed 
-            $stmt->close();
-            return true;
-        } else {
-            // user not existed
-            $stmt->close();
-            return false;
-        }
-    }
-
-    /**
+    /*
      * Encrypting password
      * @param password
      * returns salt and encrypted password
-     */
+
     public function hashSSHA($password) {
 
         $salt = sha1(rand());
@@ -99,22 +86,15 @@ class DB_Functions {
         $encrypted = base64_encode(sha1($password . $salt, true) . $salt);
         $hash = array("salt" => $salt, "encrypted" => $encrypted);
         return $hash;
-    }
+    }*/
+
 
     /**
-     * Decrypting password
-     * @param salt, password
-     * returns hash string
+     * reads all active projects and services from the db
+     * @return array[2] containing an array of projects and one of services
      */
-    public function checkhashSSHA($salt, $password) {
-
-        $hash = base64_encode(sha1($password . $salt, true) . $salt);
-
-        return $hash;
-    }
-
     public function getProjekteAndLeistung(){
-        $stmt = $this->conn->prepare("SELECT name FROM projekt");
+        $stmt = $this->conn->prepare("SELECT name FROM projekt WHERE inaktiv_flag = 0");
 
         if ($stmt->execute()) {
             $resArrayP = array();
@@ -124,7 +104,7 @@ class DB_Functions {
             }
             $stmt->close();
         }
-        $stmt = $this->conn->prepare("SELECT name FROM leistung");
+        $stmt = $this->conn->prepare("SELECT name FROM leistung WHERE inaktiv_flag = 0");
 
         if ($stmt->execute()) {
             $resArrayL = array();
