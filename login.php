@@ -8,7 +8,7 @@
 
 require_once("DB_Functions.php");
 
-$db = new DB_Functions();
+$db = new DB\Helper\DB_Functions();
 // json response array
 $response = array("error" => FALSE);
 

@@ -8,7 +8,7 @@
 
 require_once("DB_Functions.php");
 
-$db = new DB_Functions();
+$db = new DB\Helper\DB_Functions();
 
 $response = array("error" => FALSE);
 
@@ -19,7 +19,7 @@ if (isset($_POST['Dauer']) && isset($_POST['Leistung'])&& isset($_POST['Projekt'
     $leistung = $_POST['Leistung'];
     $projekt = $_POST['Projekt'];
     $mitarbeiterid = $_POST['MitarbeiterID'];
-   if($db->saveErfassung($mitarbeiterid, $leistung, $datum, $projekt, $dauer)){
+   if($db->saveErfassung(new \DB\Objects\ErfassungsEntity($mitarbeiterid, $leistung, $datum, $projekt, $dauer))){
        $response["error"] = FALSE;
        $response["sucsess"] = "erfassung has been saved";
        echo json_encode($response);

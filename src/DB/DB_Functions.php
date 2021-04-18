@@ -6,12 +6,14 @@
  * adapted by Alexandra de Groof
  */
 
+namespace DB\Helper;
+
 class DB_Functions {
 
     private $conn;
 
     // constructor
-    function __construct() {
+    public function __construct() {
         require_once 'DB_Connect.php';
         // connecting to database
         $db = new Db_Connect();
@@ -19,7 +21,7 @@ class DB_Functions {
     }
 
     // destructor
-    function __destruct() {
+    public function __destruct() {
         
     }
 
